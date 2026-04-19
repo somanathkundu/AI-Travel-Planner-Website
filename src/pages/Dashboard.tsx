@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Plane, LayoutDashboard, Plus, MessageSquare, FolderHeart,
-  LogOut, MapPin, Calendar, DollarSign, Send, X, ChevronRight
+  LogOut, MapPin, Calendar, DollarSign, Send, X, ChevronRight, Users
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Trip {
   id: string;
@@ -39,7 +40,8 @@ const Dashboard = () => {
   ]);
   const [chatInput, setChatInput] = useState("");
   const [newTrip, setNewTrip] = useState({ destination: "", dates: "", budget: "", preferences: "" });
-  const [activeTab, setActiveTab] = useState<"trips" | "saved">("trips");
+  const [activeTab, setActiveTab] = useState<"trips" | "saved" | "users">("trips");
+  const [registeredUsers, setRegisteredUsers] = useState<{ name: string; email: string; created_at: string }[]>([]);
 
   useEffect(() => {
     const stored = localStorage.getItem("trippilot_user");
@@ -47,6 +49,14 @@ const Dashboard = () => {
     setUser(JSON.parse(stored));
     const savedTrips = localStorage.getItem("trippilot_trips");
     if (savedTrips) setTrips(JSON.parse(savedTrips));
+
+    supabase
+      .from("users")
+      .select("name, email, created_at")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        if (data) setRegisteredUsers(data);
+      });
   }, [navigate]);
 
   const saveTrips = (updated: Trip[]) => {
