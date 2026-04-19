@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plane, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -14,15 +15,47 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSignup && form.password !== form.confirmPassword) {
       toast({ title: "Passwords don't match", variant: "destructive" });
       return;
     }
-    // Mock auth - store user and redirect
-    localStorage.setItem("trippilot_user", JSON.stringify({ name: form.name || "Traveler", email: form.email }));
-    toast({ title: isSignup ? "Account created!" : "Welcome back!" });
+
+    if (isSignup) {
+      const { error } = await supabase
+        .from("users")
+        .insert({ name: form.name || "Traveler", email: form.email });
+
+      if (error) {
+        toast({
+          title: "Signup failed",
+          description: error.message.includes("duplicate")
+            ? "This email is already registered."
+            : error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({ title: "Account created!", description: "Welcome to TripPilot AI 🎉" });
+    } else {
+      const { data, error } = await supabase
+        .from("users")
+        .select("name, email")
+        .eq("email", form.email)
+        .maybeSingle();
+
+      if (error || !data) {
+        toast({ title: "User not found", description: "Please sign up first.", variant: "destructive" });
+        return;
+      }
+      toast({ title: "Welcome back!" });
+    }
+
+    localStorage.setItem(
+      "trippilot_user",
+      JSON.stringify({ name: form.name || "Traveler", email: form.email })
+    );
     navigate("/dashboard");
   };
 
