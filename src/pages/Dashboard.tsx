@@ -123,6 +123,12 @@ const Dashboard = () => {
             <FolderHeart className="w-4 h-4" /> Saved Trips
           </button>
           <button
+            onClick={() => setActiveTab("users")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${activeTab === "users" ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
+          >
+            <Users className="w-4 h-4" /> Registered Users
+          </button>
+          <button
             onClick={() => setShowChat(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
           >
