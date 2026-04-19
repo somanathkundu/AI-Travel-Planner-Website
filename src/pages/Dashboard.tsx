@@ -232,6 +232,43 @@ const Dashboard = () => {
                 <Button type="submit" size="lg" className="w-full">Generate Itinerary with AI</Button>
               </form>
             </div>
+          ) : activeTab === "users" ? (
+            /* Registered Users */
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="font-display text-2xl font-bold flex items-center gap-2">
+                  <Users className="w-6 h-6 text-primary" /> Registered Users
+                </h1>
+                <span className="text-sm text-muted-foreground">{registeredUsers.length} total</span>
+              </div>
+
+              {registeredUsers.length === 0 ? (
+                <div className="text-center py-20">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-display text-lg font-semibold mb-2">No users yet</h3>
+                  <p className="text-sm text-muted-foreground">Sign-ups will appear here.</p>
+                </div>
+              ) : (
+                <div className="bg-card border border-border rounded-xl divide-y divide-border">
+                  {registeredUsers.map((u, i) => (
+                    <div key={i} className="flex items-center gap-4 p-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
+                        {u.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{u.name}</p>
+                        <p className="text-sm text-muted-foreground truncate">{u.email}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground hidden sm:block">
+                        {new Date(u.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           ) : (
             /* Trip List */
             <div>
